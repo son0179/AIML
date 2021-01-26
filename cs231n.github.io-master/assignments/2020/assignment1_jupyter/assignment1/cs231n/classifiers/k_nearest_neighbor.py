@@ -53,7 +53,6 @@ class KNearestNeighbor(object):
         return self.predict_labels(dists, k=k)
 
     def compute_distances_two_loops(self, X):
-        print("test : two loop start")
         """
         Compute the distance between each test point in X and each training point
         in self.X_train using a nested loop over both the training data and the
@@ -67,11 +66,9 @@ class KNearestNeighbor(object):
           is the Euclidean distance between the ith test point and the jth training
           point.
         """
-        num_test = X.shape[0]   # 3072
-        num_train = self.X_train.shape[0] # 3072
+        num_test = X.shape[0]   # 500
+        num_train = self.X_train.shape[0] # 5000
         dists = np.zeros((num_test, num_train))
-        print("test : two loop start")
-        """
         for i in range(num_test):
             for j in range(num_train):
                 #####################################################################
@@ -84,8 +81,8 @@ class KNearestNeighbor(object):
                 dists[i,j] =  np.sqrt( np.sum( np.square(X[i, :] - self.X_train[j, :])))
                 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        """
-        print("test : two loop done")
+        
+       
         return dists
 
     def compute_distances_one_loop(self, X):
@@ -95,11 +92,10 @@ class KNearestNeighbor(object):
 
         Input / Output: Same as compute_distances_two_loops
         """
-        num_test = X.shape[0]
+        num_test = X.shape[0] 
         num_train = self.X_train.shape[0]
         dists = np.zeros((num_test, num_train))
-        print("test : one loop start")
-        for i in range(num_test):
+        
             #######################################################################
             # TODO:                                                               #
             # Compute the l2 distance between the ith test point and all training #
@@ -107,11 +103,12 @@ class KNearestNeighbor(object):
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            dists[i, : ] = np.sqrt(np.square(self.X_train - [X[i] for j in range(i)]))
+            
+        for i in range(num_test):
+            dists[i, : ] =  np.array( list(map( lambda x : np.sqrt( np.sum( ( x - X[i, :] )**2 ) ) , self.X_train ))) 
            
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        print("test : one loop done")
         return dists
 
     def compute_distances_no_loops(self, X):
@@ -121,9 +118,7 @@ class KNearestNeighbor(object):
 
         Input / Output: Same as compute_distances_two_loops
         """
-        num_test = X.shape[0]
-        num_train = self.X_train.shape[0]
-        dists = np.zeros((num_test, num_train))
+      
         #########################################################################
         # TODO:                                                                 #
         # Compute the l2 distance between all test points and all training      #
@@ -138,12 +133,18 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
         
-        num_test = X.shape[0]
-        num_train = self.X_train.shape[0]
-        dists = np.zeros((num_test, num_train))
+        num_test = X.shape[0]   # N                       # ML 특성상 아주 많은 자료를 학습 시키기 때문에 
+        num_train = self.X_train.shape[0]   # M           # 이 값으로 시간복잡도 계산
+        dists = np.zeros((num_test, num_train))           # arr[1]은 사진 정보 K
+        # 근의 공식 사용
         dists = np.sqrt((X**2).sum(axis=1)[:, np.newaxis] + (self.X_train**2).sum(axis=1) - 2 * X.dot(self.X_train.T))
+        # 근의 공식 사용시 시간복잡도  : 행렬곱 구하는 시간 (n^2.7)
+        
+        # 구조 자체는 2중 반복 문이랑 다른게 없음
+        #dists = np.array( list( map( lambda x : list( map( lambda y : np.sqrt( np.sum((x-y)**2 )) , self.X_train) ), X  ) ) )
+        # 시간복잡도 K*N*M
+        
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -174,8 +175,10 @@ class KNearestNeighbor(object):
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            closest_y.extend( np.argsort(dists[i, :])[:k] )
-           
+            closest_y =  np.argsort(dists[i, :])
+            closest_y = list(map(lambda x : self.y_train[x], np.argsort(dists[i, :])[:k]))  
+            
+            #print(closest_y)
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
             # TODO:                                                                 #
@@ -185,7 +188,10 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            y_pred[i] = np.argsort(np.bincount(closest_y))
+            
+            #print(np.bincount(closest_y))
+            #print(np.argsort(np.bincount(closest_y))[::-1][0])
+            y_pred[i] = np.argsort(np.bincount(closest_y))[::-1][0]
             
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
