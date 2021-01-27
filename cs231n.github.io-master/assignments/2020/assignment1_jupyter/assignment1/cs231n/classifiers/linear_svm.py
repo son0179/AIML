@@ -21,7 +21,7 @@ def svm_loss_naive(W, X, y, reg):
     - loss as single float
     - gradient with respect to weights W; an array of same shape as W
     """
-    dW = np.zeros(W.shape) # initialize the gradient as zero
+    dW = np.zeros(W.shape) # initialize the gradient as zero D*10
 
     # compute the loss and the gradient
     num_classes = W.shape[1]
@@ -36,11 +36,13 @@ def svm_loss_naive(W, X, y, reg):
             margin = scores[j] - correct_class_score + 1 # note delta = 1
             if margin > 0:
                 loss += margin
-
+                dW[:,j] += X[i,:].T
+                dW[:,y[i]] -= X[i,:].T
+                    
     # Right now the loss is a sum over all training examples, but we want it
     # to be an average instead so we divide by num_train.
     loss /= num_train
-
+    dW /= num_train
     # Add regularization to the loss.
     loss += reg * np.sum(W * W)
 
@@ -54,7 +56,7 @@ def svm_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dW += 2*reg*W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     
@@ -77,7 +79,34 @@ def svm_loss_vectorized(W, X, y, reg):
     # result in loss.                                                           #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+    
+    # in y correct category (500,)
+    scores = X @ W
+    print("score.shape : ", scores.shape)
+    #print(X.shape , X[y].shape , y.shape)
+    #print(X,X[y],y)
+    ans_score =  X * W[:, y].T
+    print(ans_score.shape)
+    ans_score = np.sum(ans_score,axis=1)
+    print(ans_score.shape)
+    print(scores.shape)
+    #print(W[:,y].shape)
+    #print(ans_score.shape)
+    
+    print(ans_score)
+    ## 정답 점수 구했다
+    ## 전체 점수 구했다.
+    ## 전체 점수에 필터( margin = scores[j] - correct_class_score + 1 ) 걸어줘서 다시 만듧시다.
+    scores = scores.reshape(5000,)
+    print(ans_score[1] in scores)
+    print(scores)
+    scores =scores[ scores == ans_score]
+    print(scores)
+    #scores = scores[scores > ans_score - 1]
+    #print(scores.shape)
+    
+    
+    
     pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
