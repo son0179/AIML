@@ -3,6 +3,8 @@ import numpy as np
 from random import shuffle
 from past.builtins import xrange
 
+
+
 def softmax_loss_naive(W, X, y, reg):
     """
     Softmax loss function, naive implementation (with loops)
@@ -31,13 +33,41 @@ def softmax_loss_naive(W, X, y, reg):
     # here, it is easy to run into numeric instability. Don't forget the        #
     # regularization!                                                           #
     #############################################################################
+    
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
-
+    scores = X @ W
+    scores = np.exp(scores)
+    scores_for_dW = np.copy(scores)
+    
+    ans_score = scores[np.arange(scores.shape[0]),y]
+    scores = np.sum(scores, axis = 1)
+    
+    L= ans_score / scores
+    L = np.log(L)
+    L *= -1
+    loss += np.sum(L)       #3
+    loss /= X.shape[0]      #2
+    loss +=  reg * np.sum(W * W) # 1
+    
+    sum_SdW=np.sum(scores_for_dW, axis = 1)
+    scores_for_dW = scores_for_dW.T
+    dW = scores_for_dW / sum_SdW
+    print(dW.shape)
+    
+    dW = dW @ X
+    
+    tmp = np.zeros((W.shape[1],X.shape[0]))
+    tmp [y, np.arange(tmp.shape[1])] = 1 
+    
+    dW -= tmp @ X
+    
+    dW /= X.shape[0]
+    #scores.
+    
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
     return loss, dW
+
 
 
 def softmax_loss_vectorized(W, X, y, reg):
@@ -57,8 +87,33 @@ def softmax_loss_vectorized(W, X, y, reg):
     # regularization!                                                           #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-    pass
+    scores = X @ W
+    scores = np.exp(scores)
+    scores_for_dW = np.copy(scores)
+    
+    ans_score = scores[np.arange(scores.shape[0]),y]
+    scores = np.sum(scores, axis = 1)
+    
+    L= ans_score / scores
+    L = np.log(L)
+    L *= -1
+    loss += np.sum(L)       #3
+    loss /= X.shape[0]      #2
+    loss +=  reg * np.sum(W * W) # 1
+    
+    sum_SdW=np.sum(scores_for_dW, axis = 1)
+    scores_for_dW = scores_for_dW.T
+    dW = scores_for_dW / sum_SdW
+    print(dW.shape)
+    
+    dW = dW @ X
+    
+    tmp = np.zeros((W.shape[1],X.shape[0]))
+    tmp [y, np.arange(tmp.shape[1])] = 1 
+    
+    dW -= tmp @ X
+    
+    dW /= X.shape[0]
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

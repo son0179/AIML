@@ -32,7 +32,7 @@ class LinearClassifier(object):
         Outputs:
         A list containing the value of the loss function at each training iteration.
         """
-        num_train, dim = X.shape
+        num_train, dim = X.shape  # N D
         num_classes = np.max(y) + 1 # assume y takes values 0...K-1 where K is number of classes
         if self.W is None:
             # lazily initialize W
@@ -56,9 +56,11 @@ class LinearClassifier(object):
             # replacement is faster than sampling without replacement.              #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-            pass
-
+            
+            rand_i = np.random.choice(num_train, batch_size)
+            X_batch = X[rand_i]
+            y_batch = y[rand_i]
+            
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
             # evaluate loss and gradient
@@ -71,8 +73,9 @@ class LinearClassifier(object):
             # Update the weights using the gradient and the learning rate.          #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-            pass
+            #???
+            self.W += -1 * learning_rate * grad.T
+            
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -101,8 +104,9 @@ class LinearClassifier(object):
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        scores = X @ self.W 
+        y_pred = np.argmax(scores,axis=1)
+            
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return y_pred

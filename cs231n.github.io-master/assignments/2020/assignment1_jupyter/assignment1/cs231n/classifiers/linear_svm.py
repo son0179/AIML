@@ -80,7 +80,7 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     
-    # in y correct category (500,)
+    # in y correct category ( number of T_data,)
     scores = X @ W 
     ans_score =  X * W[:, y].T  
     ans_score = np.sum(ans_score,axis=1)
